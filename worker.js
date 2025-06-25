@@ -6,6 +6,10 @@ export default {
             return new Response('Internal Server Error', { status: 500 });
         }
 
+        if (url.pathname.match(/\.(jpg|jpeg|png|gif|svg|css|js|ico|woff|woff2)$/i)) {
+            return env.ASSETS.fetch(request);
+        }
+
         const cookies = request.headers.get('Cookie') || '';
         const hasAuthCookie = cookies.includes(`hsy_auth=${env.USERNAME}&${env.PASSWORD}`);
 
@@ -28,18 +32,29 @@ export default {
                     headers: { 'WWW-Authenticate': 'Basic realm="Login Required"' },
                 });
             } else {
-                return new Response('Login successful, redirecting...', {
-                    status: 302,
+                const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Login Successful</title>
+                    <meta http-equiv="refresh" content="1;url=/">
+                </head>
+                <body>
+                    <p>Login successful, redirecting...</p>
+                    <script>
+                        setTimeout(() => { window.location.href = '/'; }, 500);
+                    </script>
+                </body>
+                </html>`;
+
+                return new Response(html, {
+                    status: 200,
                     headers: {
-                        'Location': '/',
-                        'Set-Cookie': `hsy_auth=${username}&${password}; Path=/; HttpOnly; SameSite=Strict; Max-Age=3600`
+                        'Content-Type': 'text/html',
+                        'Set-Cookie': `hsy_auth=${username}&${password}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600`
                     }
                 });
             }
-        }
-
-        if (url.pathname.match(/\.(jpg|jpeg|png|gif|svg|css|js|ico|woff|woff2)$/i)) {
-            return env.ASSETS.fetch(request);
         }
 
         if (hasAuthCookie) {
