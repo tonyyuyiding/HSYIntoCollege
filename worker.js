@@ -32,6 +32,7 @@ export default {
                     headers: { 'WWW-Authenticate': 'Basic realm="Login Required"' },
                 });
             } else {
+                const next = url.searchParams.get('next') || '/';
                 const html = `
                 <!DOCTYPE html>
                 <html>
@@ -42,7 +43,7 @@ export default {
                 <body>
                     <p>Login successful, redirecting...</p>
                     <script>
-                        setTimeout(() => { window.location.href = '/'; }, 500);
+                        setTimeout(() => { window.location.href = '${next}'; }, 300);
                     </script>
                 </body>
                 </html>`;
@@ -60,7 +61,7 @@ export default {
         if (hasAuthCookie) {
             return env.ASSETS.fetch(request);
         } else {
-            return Response.redirect(`${url.origin}/login`, 302);
+            return Response.redirect(`${url.origin}/login?next=${url}`, 302);
         }
     }
 };
