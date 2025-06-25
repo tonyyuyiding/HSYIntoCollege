@@ -38,6 +38,10 @@ export default {
             }
         }
 
+        if (url.pathname.match(/\.(jpg|jpeg|png|gif|svg|css|js|ico|woff|woff2)$/i)) {
+            return env.ASSETS.fetch(request);
+        }
+
         if (hasAuthCookie) {
             return env.ASSETS.fetch(request);
         } else {
