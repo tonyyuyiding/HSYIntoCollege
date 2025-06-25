@@ -1,5 +1,6 @@
 {
   "name": "hsy-into-college",
+  "main": "worker.js",
   "compatibility_date": "2025-06-25",
   "assets": {
     "directory": "./build"
