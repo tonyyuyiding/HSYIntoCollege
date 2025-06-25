@@ -33,17 +33,19 @@ export default {
                 });
             } else {
                 const next = url.searchParams.get('next') || '/';
+                const safeNext = decodeURIComponent(next);
+                
                 const html = `
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <title>Login Successful</title>
-                    <meta http-equiv="refresh" content="1;url=/">
+                    <meta http-equiv="refresh" content="1;url=${encodeURI(safeNext)}">
                 </head>
                 <body>
                     <p>Login successful, redirecting...</p>
                     <script>
-                        setTimeout(() => { window.location.href = '${next}'; }, 300);
+                        setTimeout(() => { window.location.href = "${safeNext.replace(/"/g, '\\"')}"; }, 500);
                     </script>
                 </body>
                 </html>`;
@@ -61,7 +63,8 @@ export default {
         if (hasAuthCookie) {
             return env.ASSETS.fetch(request);
         } else {
-            return Response.redirect(`${url.origin}/login?next=${url}`, 302);
+            const encodedUrl = encodeURIComponent(url.toString());
+            return Response.redirect(`${url.origin}/login?next=${encodedUrl}`, 302);
         }
     }
 };
